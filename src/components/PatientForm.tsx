@@ -1,12 +1,23 @@
 import { useForm } from 'react-hook-form'
+// TODO: Este es el tipado para utilizar todo el potencial de reactForm
+import { FieldValues} from 'react-hook-form'
 import Error from './Error';
+// import { DraftPatient } from '../types';
+
+type DraftPatient = FieldValues & {
+    name: string
+    caretaker: string
+    email: string
+    date: Date
+    symptoms: string
+}
 
 export default function PatientForm() {
     
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors } } = useForm<DraftPatient>();
 
-    const registerPatient = ()=> {
-        console.log('Nuevo paciente!')
+    const registerPatient = (data: DraftPatient)=> {
+        console.log(data);
     }
     return (
       <div className="md:w-1/2 lg:w-2/5 mx-5">
@@ -34,17 +45,18 @@ export default function PatientForm() {
                         {...register('name', {
                             required: 'El nombre del paciente es obligatorio',
                             maxLength: {
-                                value: 8,
-                                message: 'Máximo 8 Caracteres'
+                                value: 15,
+                                message: 'Máximo 15 Caracteres'
                             }
                         })}
                     />
                     {
                         errors.name &&
                         <Error>
-                            {errors.name?.message?.toString()}
+                            {errors.name.message}
                         </Error>
                     }
+                    {/* TODO: Ver nota arriba para el tipado */}
                     {
                         errors.maxLength &&
                         <Error>
@@ -69,7 +81,7 @@ export default function PatientForm() {
                   {
                         errors.caretaker &&
                         <Error>
-                            {errors.caretaker?.message?.toString()}
+                            {errors.caretaker.message}
                         </Error>
                     }
                 </div>
@@ -95,7 +107,7 @@ export default function PatientForm() {
                 {
                     errors.email &&
                     <Error>
-                        {errors.email?.message?.toString()}
+                        {errors.email.message}
                     </Error>
                 }
               </div>
@@ -115,7 +127,7 @@ export default function PatientForm() {
                     {
                         errors.date &&
                         <Error>
-                            {errors.date?.message?.toString()}
+                            {errors.date.message}
                         </Error>
                     }
               </div>
@@ -135,7 +147,7 @@ export default function PatientForm() {
                     {
                         errors.symptoms &&
                         <Error>
-                            {errors.symptoms?.message?.toString()}
+                            {errors.symptoms.message}
                         </Error>
                     }
               </div>
