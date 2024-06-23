@@ -1,10 +1,13 @@
 import { useForm } from 'react-hook-form'
 // TODO: Este es el tipado para utilizar todo el potencial de reactForm
 import { FieldValues} from 'react-hook-form'
+import { toast } from 'react-toastify'
 import Error from './Error';
-// import { DraftPatient } from '../types';
+import { DraftPatient } from '../types';
+import { usePatientStore } from '../store';
+import { useEffect } from 'react';
 
-type DraftPatient = FieldValues & {
+type DraftPatientModified = FieldValues & {
     name: string
     caretaker: string
     email: string
@@ -13,12 +16,48 @@ type DraftPatient = FieldValues & {
 }
 
 export default function PatientForm() {
-    
-    const { register, handleSubmit, formState: { errors } } = useForm<DraftPatient>();
+    const { addPatient, patients, activeId, editPatient } = usePatientStore()
+    const { register, handleSubmit, setValue, formState: { errors }, reset } = useForm<DraftPatientModified>();
 
-    const registerPatient = (data: DraftPatient)=> {
-        console.log(data);
+    const registerPatient = (data: DraftPatientModified)=> {
+        const { name, caretaker, email, date, symptoms } = data
+        const modifiedData: DraftPatient = {
+            name,
+            caretaker,
+            email,
+            date,
+            symptoms
+        };
+
+        const newPatient = {
+            ...modifiedData,
+            id: activeId
+        }
+        
+        if(activeId) {
+            editPatient(newPatient)
+            toast('Paciente actualizado correctamente', {
+                type: 'success'
+            })
+        } else {
+            addPatient(modifiedData)
+            toast.success('Paciente registrado correctamente')
+        }
+
+        reset();
     }
+
+    useEffect(()=>{
+        if(activeId) {
+            const editPatient = patients.filter(patient => patient.id === activeId )[0]
+            setValue('name', editPatient.name);
+            setValue('caretaker', editPatient.caretaker);
+            setValue('email', editPatient.email);
+            setValue('date', editPatient.date);
+            setValue('symptoms', editPatient.symptoms);
+        }
+    },[activeId])
+
     return (
       <div className="md:w-1/2 lg:w-2/5 mx-5">
           <h2 className="font-black text-3xl text-center">Seguimiento Pacientes</h2>
